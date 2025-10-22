@@ -81,5 +81,6 @@ if __name__ == '__main__':
     cvae, encoder, decoder = cvae_general.define_cvae(Xtrain, ytrain, latent_space, layout[0], layout[1], activation_function, args.seed)
     trained_cvae = cvae_general.train_cvae(cvae, Xtrain, ytrain, Xval, yval, 32, 50, Adam(learning_rate=learning_rate, epsilon=epsilon), 5)
 
-    encoder.save(args.encoder_save_loc)
-    decoder.save(args.decoder_save_loc)
+    # Save models using the new Keras 3 format
+    encoder.save(args.encoder_save_loc, save_format='keras')
+    decoder.save(args.decoder_save_loc, save_format='keras')

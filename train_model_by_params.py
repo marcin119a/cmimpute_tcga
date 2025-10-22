@@ -22,7 +22,6 @@ if __name__ == '__main__':
     parser.add_argument('learning_rate', help='Learning rate used by the Adam optimizer', type=float)
     parser.add_argument('epsilon', help='Epsilon used by the Adam optimizer', type=float)
     parser.add_argument('layout_index', help='Integer between 0 and 4 to select the layout of hidden layers (see paper for options)', type=int)
-
     parser.add_argument('--val_seed', help="Random seed for selecting the validation dataset", default=-1, type=int)
     parser.add_argument('--seed', help="Random seed used to initiate model training", default=42, type=int)
 
@@ -47,22 +46,38 @@ if __name__ == '__main__':
     Xval = val_data[val_data.columns[args.d_start:]]
     yval = val_data[val_data.columns[:args.d_start]]
 
-    print(Xtrain.shape)
-    print(ytrain.shape)
-    print(Xval.shape)
-    print(yval.shape)
+    print('\n' + '='*60)
+    print('DATA SHAPES')
+    print('='*60)
+    print(f'Training features (X):   {Xtrain.shape[0]:>6} samples × {Xtrain.shape[1]:>6} probes')
+    print(f'Training labels (y):     {ytrain.shape[0]:>6} samples × {ytrain.shape[1]:>6} features')
+    print(f'Validation features (X): {Xval.shape[0]:>6} samples × {Xval.shape[1]:>6} probes')
+    print(f'Validation labels (y):   {yval.shape[0]:>6} samples × {yval.shape[1]:>6} features')
 
     layouts = [(1, [2 ** args.n]), (2, [2 ** args.n, 2 ** args.n]), (3, [2 ** args.n, 2 ** args.n, 2 ** args.n]), (2, [2 ** (args.n + 1), 2 ** args.n]), (3, [2 ** (args.n + 2), 2 ** (args.n + 1), 2 ** args.n])]
     layout = layouts[args.layout_index]
+    n_epochs = 50
+    batch_size = 32
 
-    print(layout)
-    print(args.activation_function)
-    print(args.latent_space_dimension)
-    print(args.learning_rate)
-    print(args.epsilon)
+    print('\n' + '='*60)
+    print('MODEL HYPERPARAMETERS')
+    print('='*60)
+    print(f'Layout index:            {args.layout_index}')
+    print(f'Number of layers:        {layout[0]}')
+    print(f'Layer dimensions:        {layout[1]}')
+    print(f'Activation function:     {args.activation_function}')
+    print(f'Latent space dimension:  {args.latent_space_dimension}')
+    print(f'Learning rate:           {args.learning_rate}')
+    print(f'Epsilon:                 {args.epsilon}')
+    print(f'Random seed:             {args.seed}')
+    print(f'Validation seed:         {args.val_seed}')
+    print(f'Number of epochs:        {n_epochs}')
+    print(f'Batch size:              {batch_size}')
+    print('='*60 + '\n')
 
     cvae, encoder, decoder = cvae_general.define_cvae(Xtrain, ytrain, args.latent_space_dimension, layout[0], layout[1], args.activation_function, args.seed)
-    trained_cvae = cvae_general.train_cvae(cvae, Xtrain, ytrain, Xval, yval, 32, 3, Adam(learning_rate=args.learning_rate, epsilon=args.epsilon), 5)
+    trained_cvae = cvae_general.train_cvae(cvae, Xtrain, ytrain, Xval, yval, batch_size, n_epochs, Adam(learning_rate=args.learning_rate, epsilon=args.epsilon), 5)
 
-    encoder.save(args.encoder_save_loc)
-    decoder.save(args.decoder_save_loc)
+    # Save models using the new Keras 3 format
+    encoder.save(args.encoder_save_loc, save_format='keras')
+    decoder.save(args.decoder_save_loc, save_format='keras')
