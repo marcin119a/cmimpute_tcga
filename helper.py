@@ -43,6 +43,12 @@ def get_training_val_datasets(training, tissue_index, t_start, t_end, species_in
     for combo in val_combos:
         val_data.append(training.loc[combo_individuals[combo]])
     val_data = pd.concat(val_data)
+    
+    # Safety check: ensure validation set is not empty
+    if len(val_data) == 0:
+        raise ValueError(f"Validation dataset is empty after splitting. "
+                       f"Training combos: {len(train_combos)}, Validation combos: {len(val_combos)}. "
+                       f"Try using a different validation seed (--val_seed) or check your data.")
 
     return train_data, val_data
 
@@ -57,8 +63,21 @@ def get_single_train_val_combination_split(training_combos, random_seed):
         if not same_spec or not same_tiss:
             to_remove.append(val_combo)
 
-    train_combos += to_remove
-    val_combos = [x for x in val_combos if x not in to_remove]
+    # Only apply filtering if it won't result in an empty validation set
+    if len(to_remove) < len(val_combos):
+        train_combos += to_remove
+        val_combos = [x for x in val_combos if x not in to_remove]
+    else:
+        # If all validation combos would be removed, keep a minimal validation set
+        # Move some combos back to ensure at least 10% remain in validation
+        min_val_size = max(1, int(0.1 * len(training_combos)))
+        if len(val_combos) < min_val_size:
+            # Need to get more validation samples
+            num_to_add = min_val_size - len(val_combos)
+            # Move some from training back to validation
+            combos_to_move = train_combos[:num_to_add]
+            train_combos = train_combos[num_to_add:]
+            val_combos.extend(combos_to_move)
 
     return train_combos, val_combos
 
