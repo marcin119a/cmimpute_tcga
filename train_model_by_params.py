@@ -79,5 +79,9 @@ if __name__ == '__main__':
     trained_cvae = cvae_general.train_cvae(cvae, Xtrain, ytrain, Xval, yval, batch_size, n_epochs, Adam(learning_rate=args.learning_rate, epsilon=args.epsilon), 5)
 
     # Save models using the new Keras 3 format
-    encoder.save(args.encoder_save_loc, save_format='keras')
-    decoder.save(args.decoder_save_loc, save_format='keras')
+    # Ensure paths have .keras extension if not .h5
+    encoder_path = args.encoder_save_loc if args.encoder_save_loc.endswith(('.keras', '.h5')) else args.encoder_save_loc + '.keras'
+    decoder_path = args.decoder_save_loc if args.decoder_save_loc.endswith(('.keras', '.h5')) else args.decoder_save_loc + '.keras'
+    
+    encoder.save(encoder_path)
+    decoder.save(decoder_path)
