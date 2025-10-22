@@ -162,19 +162,19 @@ optional arguments:
 #### Testing dataset
 The species and tissue combinations are extractd from those present in a testing dataset. The testing dataset is assumed to be in the same format as the training dataset.
 ```
-generate_predictions.py example_data/test.pickle 0 58 59 406 407 2 example_data/decoder_1_by_index.model/ example_data/preds_from_test_data.pickle
+python3 generate_predictions.py example_data/test.pickle 0 58 59 406 407 2 example_data/decoder_1_by_params.model.keras example_data/preds_from_test_data.pickle
 ```
 
 #### Command line arguments
 A single species and tissue combination is provided as command line arguments using the --species and --tissue flags.
 ```
-python3 generate_predictions.py example_data/train.csv.gz 0 58 59 406 407 2 example_data/decoder_1_by_index.model/ example_data/preds_from_command_line_args.csv --species Mouse --tissue Liver
+python3 generate_predictions.py example_data/train.csv.gz 0 58 59 406 407 2 example_data/decoder_1_by_params.model.keras example_data/preds_from_command_line_args.csv --species Mouse --tissue Liver
 ```
 
 #### File with combinations
 The species and tissue combinations to be imputed are in a tab-delimited file (with tissues in the first column and species in the second). The file is provided as a command line argument using the --input_file flag.
 ```
-generate_predictions.py example_data/train.pickle 0 58 59 406 407 2 example_data/decoder_1_by_params.model/ example_data/preds_from_input_file.csv --input_file example_data/combos_to_impute.txt
+python3 generate_predictions.py example_data/train.pickle 0 58 59 406 407 2 example_data/decoder_1_by_params.model.keras example_data/preds_from_input_file.csv --input_file example_data/combos_to_impute.txt
 ```
 
 # License

@@ -2,7 +2,6 @@ import helper
 import pandas as pd
 from tensorflow import keras
 import argparse
-import cvae_general
 import os
 
 if __name__ == '__main__':
@@ -31,6 +30,7 @@ if __name__ == '__main__':
         data = pd.read_table(args.data, index_col=0)
     data = data.dropna(axis=1)
 
+    # Load decoder model (Keras 3 format: .keras or .h5)
     decoder = keras.models.load_model(args.decoder)
     decoder.compile(loss='mse')
 
